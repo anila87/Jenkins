@@ -54,7 +54,7 @@ pipeline {
                           mvn deploy:deploy-file \
                             -DgroupId=com.demo \
                             -DartifactId=jenkins-demo \
-                            -Dversion=1.0 \
+                            -Dversion=1.0.${BUILD_NUMBER} \
                             -Dpackaging=jar \
                             -Dfile=target/jenkins-demo-1.0.jar \
                             -DrepositoryId=artifact-registry \
