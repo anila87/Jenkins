@@ -68,7 +68,7 @@ resource "google_compute_instance" "jenkins_vm" {
 
   boot_disk {
     initialize_params {
-      image = "debian-12-bookworm-v20230214" # Latest Debian image
+    source_image = "projects/debian-cloud/global/images/family/debian-12"
       size  = 20
     }
   }
