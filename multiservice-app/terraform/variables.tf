@@ -21,3 +21,8 @@ variable "pubsub_topic_name" {
 variable "cloud_function_name" {
   default = "service-b-func"
 }
+
+variable "bucket" {
+
+  default = "test-run1b"
+}
