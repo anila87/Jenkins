@@ -50,9 +50,13 @@ resource "google_cloudfunctions_function" "service_b" {
 
 
 resource "google_storage_bucket" "functions_bucket" {
-  name     = "${var.project_id}-functions-bucket"
-  location = var.region
+  name          = var.bucket_name
+  location      = var.region
+  force_destroy = true
+
+  uniform_bucket_level_access = true
 }
+
 
 resource "google_storage_bucket_object" "functions_archive" {
   name   = "service-b.zip"
