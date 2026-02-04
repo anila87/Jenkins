@@ -17,7 +17,9 @@ resource "google_cloud_run_service" "app" {
   location = var.region
 
   template {
+
     spec {
+         service_account_name = "jenkins-sa@project-ca896fcb-d1a8-4e3c-94d.iam.gserviceaccount.com"
       containers {
         image = var.image_uri
 
