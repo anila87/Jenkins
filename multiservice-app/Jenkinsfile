@@ -4,8 +4,11 @@ pipeline {
         PROJECT_ID = 'project-ca896fcb-d1a8-4e3c-94d'
         REGION = 'us-central1'
         REPO = 'docker-repo'
+        BUCKET_NAME = 'test-run1a'
         IMAGE = "service-a"
         TAG = "v1"
+        GCP_KEY = credentials('gcp-sa.json')
+        TF_DIR = 'terraform'
     }
     stages {
         stage('Checkout') {
@@ -14,22 +17,44 @@ pipeline {
             }
         }
 
+        stage('Prepare Cloud Function Zip') {
+            steps {
+                dir('service-B') {
+                    sh '''
+                        echo "Zipping Cloud Function code..."
+                        zip -r ../service-B.zip *
+                    '''
+                }
+            }
+        }
+
+        stage('Upload to GCS') {
+            steps {
+                sh '''
+                    echo "Authenticating with GCP..."
+                    gcloud auth activate-service-account --key-file=$GCP_KEY
+                    gcloud config set project $PROJECT_ID
+
+                    echo "Uploading Cloud Function zip to GCS..."
+                    gsutil cp service-B.zip gs://$BUCKET_NAME/service-B.zip
+                '''
+            }
+        }
+
         stage('GCP Auth') {
             steps {
-                withCredentials([file(credentialsId: 'gcp-sa.json', variable: 'GCP_KEY')]) {
-                    sh '''
+                sh '''
                     gcloud auth activate-service-account --key-file=$GCP_KEY
                     gcloud config set project $PROJECT_ID
                     gcloud auth configure-docker ${REGION}-docker.pkg.dev --quiet
-                    '''
-                }
+                '''
             }
         }
 
         stage('Build Docker Image') {
             steps {
                 sh '''
-                docker build -t ${REGION}-docker.pkg.dev/$PROJECT_ID/$REPO/$IMAGE:$TAG ./service-a
+                    docker build -t ${REGION}-docker.pkg.dev/$PROJECT_ID/$REPO/$IMAGE:$TAG ./service-a
                 '''
             }
         }
@@ -37,9 +62,34 @@ pipeline {
         stage('Push to Artifact Registry') {
             steps {
                 sh '''
-                docker push ${REGION}-docker.pkg.dev/$PROJECT_ID/$REPO/$IMAGE:$TAG
+                    docker push ${REGION}-docker.pkg.dev/$PROJECT_ID/$REPO/$IMAGE:$TAG
                 '''
             }
+        }
+
+        stage('Terraform Init & Apply') {
+            steps {
+                dir("${TF_DIR}") {
+                    sh '''
+                        export GOOGLE_APPLICATION_CREDENTIALS=$GCP_KEY
+
+                        echo "Initializing Terraform..."
+                        terraform init
+
+                        echo "Applying Terraform..."
+                        terraform apply -auto-approve
+                    '''
+                }
+            }
+        }
+    }
+
+    post {
+        success {
+            echo "✅ Pipeline completed successfully!"
+        }
+        failure {
+            echo "❌ Pipeline failed. Check logs!"
         }
     }
 }
