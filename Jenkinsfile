@@ -21,7 +21,7 @@ pipeline {
 
         stage('GCP Auth') {
             steps {
-        withCredentials([file(credentialsId: 'gcp-sa', variable: 'GCP_KEY')]) {
+        withCredentials([file(credentialsId: 'gcp-sa.json', variable: 'GCP_KEY')]) {
             sh '''
               gcloud auth activate-service-account --key-file=$GCP_KEY
               gcloud config set project $PROJECT_ID
