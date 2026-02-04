@@ -3,6 +3,7 @@ pipeline {
 
     environment {
         REPO_URL = 'https://us-central1-maven.pkg.dev/project-ca896fcb-d1a8-4e3c-94d/test-jenkins'
+        TF_DIR = 'infra' // Terraform folder path
     }
 
     tools {
@@ -65,6 +66,23 @@ pipeline {
                 }
             }
         }
+        stage('Terraform Apply - Provision VM & Deploy Artifact') {
+            steps {
+                withCredentials([file(credentialsId: 'gcp-sa.json', variable: 'GCP_KEY')]) {
+                    dir("$TF_DIR") {
+                        sh '''
+                          # Set GCP credentials for Terraform
+                          export GOOGLE_APPLICATION_CREDENTIALS=$GCP_KEY
+                          export GOOGLE_PROJECT=project-ca896fcb-d1a8-4e3c-94d
+                          terraform init
+                          terraform plan 
+                          terraform apply -auto-approve
+                        '''
+                    }
+                }
+            }
+        }
+        
     }
 
     post {
