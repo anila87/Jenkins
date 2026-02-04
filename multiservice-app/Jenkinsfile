@@ -19,12 +19,16 @@ pipeline {
 
         stage('Prepare Cloud Function Zip') {
             steps {
-                dir('service-B') {
-                    sh '''
-                        echo "Zipping Cloud Function code..."
-                        zip -r ../service-B.zip main.py requirements.txt
-                    '''
-                }
+               dir('multiservice-app/service-B') {
+    sh '''
+        echo "Current directory: $(pwd)"
+        echo "Listing files:"
+        ls -la
+        echo "Zipping Cloud Function code..."
+        zip -r ../../service-B.zip main.py requirements.txt
+    '''
+}
+
             }
         }
 
