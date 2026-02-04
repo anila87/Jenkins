@@ -49,7 +49,7 @@ pipeline {
 
         stage('Terraform Deploy Container') {
             steps {
-                withCredentials([file(credentialsId: 'gcp-sa', variable: 'GCP_KEY')]) {
+                withCredentials([file(credentialsId: 'gcp-sa.json', variable: 'GCP_KEY')]) {
                     dir('terraform') {
                         sh '''
                           export GOOGLE_APPLICATION_CREDENTIALS=$GCP_KEY
