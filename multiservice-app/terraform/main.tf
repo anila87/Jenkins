@@ -36,10 +36,10 @@ resource "google_cloudfunctions_function" "service_b" {
   description = "Cloud Function subscriber for service-a Pub/Sub"
   runtime     = "python311"
   entry_point = "main"   # your Python function entry
-  source_archive_bucket = var.bucket_name
-  source_archive_object = "service-B.zip"
+  source_archive_bucket = "test-run1a"
+  source_archive_object = "service-b.zip"
   region      = var.region
-  service_account_email = var.service_account_email
+  service_account_email = "jenkins-sa@project-ca896fcb-d1a8-4e3c-94d.iam.gserviceaccount.com"
 
   # NEW event_trigger block
   event_trigger {
