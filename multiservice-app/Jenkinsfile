@@ -58,7 +58,7 @@ pipeline {
         stage('Build Docker Image') {
             steps {
                 sh '''
-                    docker build -t ${REGION}-docker.pkg.dev/$PROJECT_ID/$REPO/$IMAGE:$TAG .multiservice-app/service-A
+                    docker build -t ${REGION}-docker.pkg.dev/$PROJECT_ID/$REPO/$IMAGE:$TAG ./multiservice-app/service-A
                 '''
             }
         }
