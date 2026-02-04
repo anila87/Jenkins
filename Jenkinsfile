@@ -26,6 +26,7 @@ pipeline {
               gcloud auth activate-service-account --key-file=$GCP_KEY
               gcloud config set project $PROJECT_ID
               gcloud auth configure-docker us-central1-docker.pkg.dev --quiet
+              '''
         }
     }
         }
