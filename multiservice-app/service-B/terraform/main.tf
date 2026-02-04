@@ -26,3 +26,8 @@ resource "google_cloud_run_service_iam_member" "invoker" {
   role       = "roles/run.invoker"
   member     = "allUsers"
 }
+
+resource "google_pubsub_topic" "service_a_topic" {
+  name = var.pubsub_topic_name
+}
+
