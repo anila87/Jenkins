@@ -1,0 +1,45 @@
+pipeline {
+    agent any
+    environment {
+        PROJECT_ID = 'project-ca896fcb-d1a8-4e3c-94d'
+        REGION = 'us-central1'
+        REPO = 'docker-repo'
+        IMAGE = "service-a"
+        TAG = "v1"
+    }
+    stages {
+        stage('Checkout') {
+            steps {
+                git branch: 'Project#2', url: 'https://github.com/anila87/Jenkins'
+            }
+        }
+
+        stage('GCP Auth') {
+            steps {
+                withCredentials([file(credentialsId: 'gcp-sa.json', variable: 'GCP_KEY')]) {
+                    sh '''
+                    gcloud auth activate-service-account --key-file=$GCP_KEY
+                    gcloud config set project $PROJECT_ID
+                    gcloud auth configure-docker ${REGION}-docker.pkg.dev --quiet
+                    '''
+                }
+            }
+        }
+
+        stage('Build Docker Image') {
+            steps {
+                sh '''
+                docker build -t ${REGION}-docker.pkg.dev/$PROJECT_ID/$REPO/$IMAGE:$TAG ./service-a
+                '''
+            }
+        }
+
+        stage('Push to Artifact Registry') {
+            steps {
+                sh '''
+                docker push ${REGION}-docker.pkg.dev/$PROJECT_ID/$REPO/$IMAGE:$TAG
+                '''
+            }
+        }
+    }
+}
