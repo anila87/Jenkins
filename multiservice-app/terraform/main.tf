@@ -50,7 +50,7 @@ resource "google_cloudfunctions_function" "service_b" {
 
 
 resource "google_storage_bucket" "functions_bucket" {
-  name          = var.bucket_name
+  name          = var.bucket
   location      = var.region
   force_destroy = true
 
