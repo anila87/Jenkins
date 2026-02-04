@@ -22,7 +22,7 @@ pipeline {
                 dir('service-B') {
                     sh '''
                         echo "Zipping Cloud Function code..."
-                        zip -r ../service-B.zip .
+                        zip -r ../service-B.zip main.py requirements.txt
                     '''
                 }
             }
