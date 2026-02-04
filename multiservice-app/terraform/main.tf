@@ -32,16 +32,22 @@ resource "google_pubsub_topic" "service_a_topic" {
 }
 
 resource "google_cloudfunctions_function" "service_b" {
-  name        = var.cloud_function_name
-  description = "Triggered by Service A Pub/Sub"
+  name        = "service-b"
+  description = "Cloud Function subscriber for service-a Pub/Sub"
   runtime     = "python311"
+  entry_point = "main"   # your Python function entry
+  source_archive_bucket = var.bucket_name
+  source_archive_object = "service-B.zip"
   region      = var.region
-  entry_point = "hello_pubsub"
+  service_account_email = var.service_account_email
 
-  source_archive_bucket = google_storage_bucket.functions_bucket.name
-  source_archive_object = google_storage_bucket_object.functions_archive.name
-  trigger_topic         = google_pubsub_topic.service_a_topic.name
+  # NEW event_trigger block
+  event_trigger {
+    event_type = "google.pubsub.topic.publish"
+    resource   = google_pubsub_topic.service_a_topic.id
+  }
 }
+
 
 resource "google_storage_bucket" "functions_bucket" {
   name     = "${var.project_id}-functions-bucket"
