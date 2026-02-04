@@ -8,7 +8,7 @@ pipeline {
         IMAGE = "service-a"
         TAG = "v1"
         GCP_KEY = credentials('gcp-sa.json')
-        TF_DIR = 'terraform'
+        TF_DIR = 'multiservice-app/terraform'
     }
     stages {
         stage('Checkout') {
